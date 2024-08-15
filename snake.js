@@ -4,34 +4,43 @@ const inGameMusic = new Audio("Music.mp3");
 const gameOverSound = new Audio("GameOver.wav");
 let speed;
 let score = 0;
-localStorage.setItem("hiScore", 0)
+let hiScore = 0;
+if(localStorage.hiScore != null) hiScore = Number(localStorage.hiScore);
+else hiScore = 0;
 let lastDisplayTime = 0;
 let velocity = { x: 0, y: 0 }
 let snakeArr = [{ x: 10, y: 10 }];
 let a;
 let b;
-let level = prompt("Select Level(Easy, Medium, Hard, God)", "Medium");
-if (level == "Easy") {
+let level = prompt("Select Level(Easy, Medium, Hard, God)", "Medium"); //selecting level
+level = level.toLowerCase();
+if (level == "easy") {
     speed = 6;
     a = 3;
     b = 17;
 }
-if (level == "Medium") {
+else if (level == "medium") {
     speed = 9;
     a = 2;
     b = 18
 }
-if (level == "Hard") {
+else if (level == "hard") {
     speed = 12;
     a = 1;
     b = 19;
 }
-if (level == "God") {
+else if (level == "god") {
     speed = 20;
     a = 0;
     b = 20
 }
-let food = { x: Math.round(a + (b - a) * Math.random()), y: Math.round(a + (b - a) * Math.random()) }
+else {
+    alert("Invalid Level Selected. Default Level: Medium");
+    speed = 9;
+    a = 2;
+    b = 18;
+}
+let food = { x: Math.round(a + (b - a) * Math.random()), y: Math.round(a + (b - a) * Math.random()) } // setting food element at a random point
 
 function main(ctime) {
     window.requestAnimationFrame(main);
@@ -41,6 +50,8 @@ function main(ctime) {
     lastDisplayTime = ctime;
     engine();
 }
+
+//function for checking if game is over
 function gameOver(sa) {
     if (sa[0].x > 20 || sa[0].x <= 0 || sa[0].y > 20 || sa[0].y <= 0) {
         return true;
@@ -73,15 +84,16 @@ function engine() {
     foodBody.style.gridRowStart = food.y;
     foodBody.style.gridColumnStart = food.x;
     board.appendChild(foodBody);
-    if (score > localStorage.getItem("hiScore")) {
-        localStorage.setItem("hiScore", score);
+    if (score > hiScore) {
+        localStorage.hiScore = score;
+        hiScore = score;
     }
-    scoreDisplay.innerHTML = "Score: " + score + "<br>Hi-Score:" + localStorage.getItem("hiScore");
+    scoreDisplay.innerHTML = "Score: " + score + "<br>Hi-Score:" + localStorage.hiScore;
     // update snake, score and food
     if (gameOver(snakeArr)) {
         gameOverSound.play();
         inGameMusic.pause();
-        if (score == localStorage.getItem("hiScore")){
+        if (score == hiScore){
             alert("Game Over!\n" + "Congratulations!\nNew High Score: " + score);
         }
         else {
